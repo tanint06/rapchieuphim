@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Đăng nhập</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .card { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 15px 30px rgba(0,0,0,0.2); width: 350px; text-align: center; }
+        h2 { color: #333; margin-bottom: 25px; }
+        input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 15px; outline: none;}
+        input:focus { border-color: #667eea; }
+        button { width: 100%; padding: 12px; background-color: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; transition: 0.3s;}
+        button:hover { background-color: #764ba2; }
+        .error { color: #d9534f; font-weight: bold; margin-bottom: 15px; }
+        .success { color: #28a745; font-weight: bold; margin-bottom: 15px; }
+        .link { margin-top: 20px; font-size: 14px; }
+        .link a { color: #667eea; text-decoration: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>🎬 ĐĂNG NHẬP</h2>
+        <div class="error" th:if="${error}" th:text="${error}"></div>
+        <div class="success" th:if="${success}" th:text="${success}"></div>
+        
+        <form action="/login" method="post">
+            <input type="text" name="username" placeholder="Tên đăng nhập" required>
+            <input type="password" name="password" placeholder="Mật khẩu" required>
+            <button type="submit">Đăng Nhập</button>
+        </form>
+        
+        <div class="link">
+            Chưa có tài khoản? <a href="/register">Đăng ký tại đây</a>
+        </div>
+    </div>
+</body>
+</html>

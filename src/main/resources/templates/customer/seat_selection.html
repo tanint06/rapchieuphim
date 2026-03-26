@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Chọn ghế - RapChieuPhim</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        .screen {
+            background: #ddd;
+            height: 50px;
+            width: 100%;
+            margin: 20px 0;
+            text-align: center;
+            line-height: 50px;
+            border-radius: 50% 50% 0 0;
+            box-shadow: 0 3px 10px rgba(255,255,255,0.7);
+        }
+        .seat {
+            width: 35px;
+            height: 35px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            font-size: 12px;
+            line-height: 35px;
+            display: inline-block;
+        }
+        .seat-available { background-color: #6c757d; color: white; }
+        .seat-occupied { background-color: #dc3545; cursor: not-allowed; color: white; }
+        .seat-selected { background-color: #28a745; color: white; }
+    </style>
+</head>
+<body class="bg-dark text-white shadow">
+    <div class="container py-5">
+        <h2 class="text-center" th:text="${showtime.movie.title}">Tên Phim</h2>
+        <div th:if="${param.error}" class="alert alert-danger text-center mt-3 fw-bold">
+    ⚠️ Xin lỗi, ghế này vừa bị người khác nhanh tay đặt mất. Vui lòng chọn ghế khác!
+</div>
+        <p class="text-center text-info" th:text="${'Phòng: ' + showtime.roomName + ' | Giờ: ' + #temporals.format(showtime.startTime, 'HH:mm dd/MM')}"></p>
+
+        <div class="screen">MÀN HÌNH</div>
+
+        <div class="text-center mb-5">
+            <div th:each="row : ${ {'A', 'B', 'C', 'D', 'E'} }">
+                <div class="d-flex justify-content-center">
+                    <div th:each="col : ${ #numbers.sequence(1, 10) }" 
+                        th:with="seatCode=${row + col}"
+                        th:classappend="${#lists.contains(occupiedSeats, seatCode)} ? 'seat-occupied' : 'seat-available'"
+                        class="seat" 
+                        th:text="${seatCode}"
+                        th:attr="data-seat=${seatCode}" 
+                        onclick="if(!this.classList.contains('seat-occupied')) selectSeat(this)">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card bg-secondary text-white p-3 col-md-4 mx-auto mt-4">
+            <h5>Thông tin đặt vé</h5>
+            <p>Ghế đã chọn: <span id="displaySelected">Chưa chọn</span></p>
+            <p>Tổng tiền: <span id="displayPrice">0</span> VNĐ</p>
+            
+            <form th:action="@{/booking/confirm}" method="post">
+                <input type="hidden" name="showtimeId" th:value="${showtime.id}">
+                <input type="hidden" name="seatNumbers" id="inputSeats">
+                <button type="submit" class="btn btn-warning w-100" id="btnConfirm" disabled>Xác nhận đặt vé</button>
+            </form>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        // Dùng mảng (Array) để chứa nhiều ghế thay vì 1 biến
+        let selectedSeats = []; 
+        const pricePerSeat = [[${showtime.price}]];
+
+        function selectSeat(element) {
+            const code = element.getAttribute('data-seat');
+
+            // Kiểm tra xem ghế này đã được chọn chưa
+            if (selectedSeats.includes(code)) {
+                // Nếu đã chọn rồi -> Bỏ chọn (Xóa khỏi mảng)
+                selectedSeats = selectedSeats.filter(seat => seat !== code);
+                element.classList.replace('seat-selected', 'seat-available');
+            } else {
+                // Nếu chưa chọn -> Thêm vào mảng
+                selectedSeats.push(code);
+                element.classList.replace('seat-available', 'seat-selected');
+            }
+
+            // Cập nhật giao diện hiển thị
+            document.getElementById('displaySelected').innerText = selectedSeats.length > 0 ? selectedSeats.join(', ') : 'Chưa chọn';
+            
+            // Tính tổng tiền = Số ghế x Giá 1 vé
+            const totalPrice = selectedSeats.length * pricePerSeat;
+            document.getElementById('displayPrice').innerText = totalPrice.toLocaleString();
+            
+            // Gắn mảng các ghế (VD: "A1,A2,A3") vào ô input ẩn để gửi về Java
+            document.getElementById('inputSeats').value = selectedSeats.join(',');
+            
+            // Bật nút "Xác nhận" nếu có ít nhất 1 ghế được chọn
+            document.getElementById('btnConfirm').disabled = selectedSeats.length === 0;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${movie.id == null ? 'Thêm Phim Mới' : 'Cập Nhật Phim'}">Thông tin Phim</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
+        .form-input:focus { border-color: #4f46e5; ring-color: #4f46e5; }
+    </style>
+</head>
+<body class="py-10 px-4">
+
+    <div class="max-w-4xl mx-auto">
+        <div class="mb-6">
+            <a href="/admin/movies" class="text-indigo-600 hover:text-indigo-800 font-medium flex items-center gap-2 transition">
+                <i class="fa-solid fa-arrow-left"></i> Quay lại danh sách
+            </a>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
+            <div class="bg-indigo-600 px-8 py-6">
+                <h2 class="text-2xl font-bold text-white flex items-center gap-3">
+                    <i th:class="${movie.id == null ? 'fa-solid fa-plus-circle' : 'fa-solid fa-pen-to-square'}"></i>
+                    <span th:text="${movie.id == null ? 'THÊM PHIM MỚI' : 'CẬP NHẬT THÔNG TIN PHIM'}"></span>
+                </h2>
+                <p class="text-indigo-100 text-sm mt-1 opacity-80">Vui lòng điền đầy đủ các thông tin có dấu (*)</p>
+            </div>
+
+            <form th:action="@{/admin/movies/save}" method="post" th:object="${movie}" class="p-8">
+                <input type="hidden" th:field="*{id}">
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    
+                    <div class="md:col-span-2 space-y-5">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Tên phim <span class="text-red-500">*</span></label>
+                            <input type="text" th:field="*{title}" required 
+                                   class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition outline-none" 
+                                   placeholder="Ví dụ: Avengers: Endgame">
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1">Thể loại</label>
+                                <input type="text" th:field="*{genre}" 
+                                       class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition outline-none" 
+                                       placeholder="Hành động, Viễn tưởng...">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1">Thời lượng (phút) <span class="text-red-500">*</span></label>
+                                <input type="number" th:field="*{duration}" required 
+                                       class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition outline-none" 
+                                       placeholder="120">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Link ảnh Poster</label>
+                            <input type="text" id="posterLink" th:field="*{poster}" 
+                                   class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition outline-none" 
+                                   placeholder="https://image.url/poster.jpg">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Mô tả nội dung</label>
+                            <textarea th:field="*{description}" rows="4" 
+                                      class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition outline-none" 
+                                      placeholder="Tóm tắt nội dung phim..."></textarea>
+                        </div>
+
+                        <div class="flex items-center p-4 bg-gray-50 rounded-xl border border-dashed border-gray-300">
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" th:field="*{active}" class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                                <span class="ml-3 text-sm font-medium text-gray-700">Hiển thị trên trang chủ (Đang chiếu)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col items-center">
+                        <label class="block text-sm font-semibold text-gray-700 mb-3 self-start">Xem trước Poster</label>
+                        <div class="w-full aspect-[2/3] bg-gray-100 rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden relative group">
+                            <img id="previewImg" th:src="${movie.poster != null ? movie.poster : ''}" 
+                                 class="w-full h-full object-cover transition duration-300 group-hover:scale-105"
+                                 onerror="this.src='https://placehold.co/400x600?text=No+Image';">
+                            <div th:if="${movie.poster == null}" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 p-4 text-center">
+                                <i class="fa-regular fa-image text-4xl mb-2"></i>
+                                <p class="text-xs italic">Ảnh sẽ hiển thị tại đây khi bạn dán link</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <hr class="my-8 border-gray-100">
+
+                <div class="flex flex-col md:flex-row gap-4 items-center justify-end">
+                    <a href="/admin/movies" class="w-full md:w-auto px-8 py-3 text-gray-500 font-semibold hover:bg-gray-100 rounded-xl transition text-center">
+                        HỦY BỎ
+                    </a>
+                    <button type="submit" class="w-full md:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-12 rounded-xl shadow-lg shadow-indigo-200 transition transform hover:-translate-y-0.5">
+                        <i class="fa-solid fa-save mr-2"></i> LƯU THÔNG TIN
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Logic đơn giản để update ảnh preview khi Admin nhập link
+        const posterInput = document.getElementById('posterLink');
+        const previewImg = document.getElementById('previewImg');
+
+        posterInput.addEventListener('input', function() {
+            if (this.value) {
+                previewImg.src = this.value;
+            } else {
+                previewImg.src = 'https://placehold.co/400x600?text=No+Image';
+            }
+        });
+    </script>
+</body>
+</html>

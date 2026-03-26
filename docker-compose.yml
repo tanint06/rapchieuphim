@@ -1,0 +1,13 @@
+version: '3.8'
+services:
+  db:
+    image: mysql:8.0
+    container_name: mysql_rapchieuphim
+    restart: always
+    environment:
+      MYSQL_DATABASE: rapchieuphimdb
+      MYSQL_ROOT_PASSWORD: admin
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./mysql_data:/var/lib/mysql

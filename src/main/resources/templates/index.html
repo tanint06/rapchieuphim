@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Trang Chủ - Rạp Chiếu Phim</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #1a1a2e; margin: 0; padding: 0; color: white;}
+        /* Thanh điều hướng */
+        .navbar { background-color: #16213e; padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5);}
+        .navbar h2 { margin: 0; color: #e94560; }
+        .user-info { display: flex; align-items: center; gap: 20px; }
+        .navbar a { color: white; text-decoration: none; font-weight: bold; background: #e94560; padding: 8px 20px; border-radius: 5px; transition: 0.3s;}
+        .navbar a:hover { background: #d93850; }
+        
+        /* Tiêu đề chính */
+        .container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+        .section-title { border-left: 5px solid #e94560; padding-left: 15px; margin-bottom: 30px; font-size: 24px;}
+        
+        /* Grid hiển thị danh sách phim */
+        .movie-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 30px; }
+        
+        /* Thẻ từng bộ phim (Movie Card) */
+        .movie-card { background: #0f3460; border-radius: 12px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.3); transition: transform 0.3s ease, box-shadow 0.3s ease; display: flex; flex-direction: column;}
+        .movie-card:hover { transform: translateY(-10px); box-shadow: 0 10px 25px rgba(233, 69, 96, 0.4); }
+        .movie-poster { width: 100%; height: 350px; object-fit: cover; }
+        .movie-info { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between;}
+        .movie-title { font-size: 18px; font-weight: bold; margin: 0 0 10px 0; color: #fff;}
+        .movie-meta { font-size: 14px; color: #b1b1b1; margin-bottom: 5px; }
+        .btn-book { display: block; text-align: center; background-color: #e94560; color: white; text-decoration: none; padding: 10px; border-radius: 6px; font-weight: bold; margin-top: 15px; transition: 0.3s;}
+        .btn-book:hover { background-color: #d93850; }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h2>🎬 CINEMA MAGIC</h2>
+        <div class="user-info">
+            <span>Xin chào, <b th:text="${user.fullname != null and user.fullname != '' ? user.fullname : user.username}"></b>!</span>
+            <a th:if="${user.role == 'USER'}" th:href="@{/booking/my-tickets}" class="btn btn-outline-info">🎟️ Vé của tôi</a>
+            <a th:if="${user.role == 'ADMIN'}" href="/admin/movies" style="background-color: #f39c12; color: #fff;">
+                🛠️ Quản lý Phim
+            </a>
+            <a th:if="${user.role == 'ADMIN'}" href="/admin/showtimes/add" style="background-color: #f39c12; color: #fff;">
+                🛠️ Quản lý Lịch Chiếu
+            </a>
+            <a href="/logout">Đăng xuất</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2 class="section-title">PHIM ĐANG CHIẾU</h2>
+        
+        <div class="movie-grid">
+            <div class="movie-card" th:each="movie : ${movies}">
+                <img th:src="${movie.poster}" alt="Poster Phim" class="movie-poster">
+                
+                <div class="movie-info">
+                    <div>
+                        <h3 class="movie-title" th:text="${movie.title}">Tên Phim</h3>
+                        <div class="movie-meta">🎭 Thể loại: <span th:text="${movie.genre}"></span></div>
+                        <div class="movie-meta">⏱️ Thời lượng: <span th:text="${movie.duration}"></span> phút</div>
+                    </div>
+                    <a th:href="@{/movie/detail/{id}(id=${movie.id})}" class="btn-book">🎫 ĐẶT VÉ NGAY</a>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</body>
+</html>
